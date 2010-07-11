@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Visual Reaction Time</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript">
+function main(){
+    var canvas = document.getElementById('main');
+    var ctx = canvas.getContext('2d');
+    min_ms = 2000;
+    max_ms = 5000;
+    setTimeout(function(){start(ctx)}, min_ms + (Math.random() * (max_ms - min_ms)));
+    
+}
+function start(ctx){
+    var start_ms = new Date().getTime();
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0 , 800, 600);
+    $("#main").click(function(){
+        var end_ms = new Date().getTime();
+        var reaction_time = end_ms - start_ms;
+        alert("" + reaction_time + " ");
+    })
+}
+$(main);
+</script>
+</head>
+<body>
+
+<div style="margin:auto; width: 800px; height: 600px; border: solid black 1px; padding: 10px;">
+  <canvas id="main" width="800" height="600"></canvas>
+</div>
+
+</body>
+</html>
