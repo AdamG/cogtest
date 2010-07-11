@@ -52,7 +52,7 @@ class TestHandler(webapp.RequestHandler):
     def post(self):
         if not users.get_current_user():
             return self.redirect(users.create_login_url(self.request.uri))
-        results = 1self.request.POST.getall('results')
+        results = self.request.POST.getall('results')
         for result in results:
             self._handle_result(result)
 
