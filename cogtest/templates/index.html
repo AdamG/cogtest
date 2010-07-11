@@ -10,6 +10,7 @@
         <tr>
           <th>Test Name</th>
           <th>Result</th>
+          <th>Timestamp</th>
         </tr>
       </thead>
       <tbody>
@@ -17,9 +18,11 @@
         <tr>
           <td>{{ result.test_name }}</td>
           <td>{{ result.result_value }}</td>
+          <td>{{ result.timestamp }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+
   </body>
 </html>

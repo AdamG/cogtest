@@ -4,49 +4,52 @@
   <title>Visual Reaction Time</title>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script type="text/javascript">
-function start_trial(ctx, result_callback, num_more_trials, submit_callback){
-    if(num_more_trials <= 0){
-        submit_callback()
-    }
-    min_ms = 2000;
-    max_ms = 5000;
-    setTimeout(function(){trigger(ctx, result_callback, num_more_trials, submit_callback)},
-        min_ms + (Math.random() * (max_ms - min_ms)));
-    
-}
-function trigger(ctx, result_callback, num_more_trials, submit_callback){
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0 , 800, 600);
-    var start_ms = new Date().getTime();
-    $("#main").one('click', function(){
-        var end_ms = new Date().getTime();
-        var reaction_time = end_ms - start_ms;
-        result_callback(reaction_time);
-        ctx.clearRect(0, 0 , 800, 600);
-        start_trial(ctx, result_callback, num_more_trials - 1, submit_callback)
-    });
-    
-}
-function run_trials(){
-    var canvas = document.getElementById('main');
-    var ctx = canvas.getContext('2d');
-    var results = [];
-    var _result_callback = function(result){results.push(result);
-        $("#result-table tbody").append("<tr><td>0</td><td>" + result + "</td></tr>");
-    };
-    var _submit_callback = function(){submit_results(results);};
-    start_trial(ctx, _result_callback, 5, _submit_callback);
-}
+$(function(){
+    var test = {
+        results: [],
+        ctx: document.getElementById('main').getContext("2d"),
+        min_ms: 2000,
+        max_ms: 5000,
+        start_trial: function(){
+            var t = this;
+            var callback = function(){t.trigger()};
+            setTimeout(callback, this.min_ms + (Math.random() * (this.max_ms - this.min_ms)))
+        },
+        trigger: function(){
+            var t=this;
+            this.ctx.fillStyle = "#000000";
+            this.ctx.fillRect(0, 0 , 800, 600);
+            var start_ms = new Date().getTime();
+            $("#main").one('click', function(){
+                var end_ms = new Date().getTime();
+                var reaction_time = end_ms - start_ms;
+                this.result_callback(reaction_time)
+                
+                this.ctx.clearRect(0, 0 , 800, 600);
+                this.start_trial()
+            });
 
-function submit_results(results){
-    var $results = $("#results");
-    $.each(results, function(ii, result){
-        $results.append("<input type='hidden' name='results' value=\"" + result + "\" />");
-    })
-    alert($results.serialize());
-    $results.submit();
-}
-$(run_trials);
+        },
+        result_callback: function(result){
+            this.results.push(result);
+            $("#result-table tbody").append("<tr><td>" + this.results.length + "</td><td>" + result + "</td></tr>");
+            if(this.results.length >= 5){
+                $("#submit-results").show()
+            }
+        },
+        submit_results: function(){
+            var $results = $("#results");
+            $.each(this.results, function(ii, result){
+                $results.append("<input type='hidden' name='results' value=\"" + result + "\" />");
+            });
+            $results.submit();
+        },
+    }
+    $("#submit-results").bind('click', function(){test.submit_results()});
+    test.start_trial();
+});
+        
+
 </script>
 </head>
 <body>
@@ -67,6 +70,9 @@ $(run_trials);
   </tbody>
 </table>
 
+<div style="display: none;cursor:pointer;text-align: center; margin: 15;" id="submit-results">
+Submit Results
+</div>
 
 <form id="results" style="display: none;" action="" method="post">
 </form>

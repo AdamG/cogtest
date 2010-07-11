@@ -26,7 +26,7 @@ class Index(webapp.RequestHandler):
     def get(self):
         if not users.get_current_user():
             return self.redirect(users.create_login_url(self.request.uri))
-        result_query = TestResult.all().filter("user=", users.get_current_user()).order('-timestamp')
+        result_query = TestResult.all().filter("user =", users.get_current_user()).order('-timestamp')
         results = result_query.fetch(100)
 
 
@@ -36,6 +36,7 @@ class Index(webapp.RequestHandler):
 
         path = os.path.join(os.path.dirname(__file__), "templates", 'index.html')
         self.response.out.write(template.render(path, template_values))
+
 
 class TestHandler(webapp.RequestHandler):
     def get(self):
@@ -55,6 +56,8 @@ class TestHandler(webapp.RequestHandler):
         results = self.request.POST.getall('results')
         for result in results:
             self._handle_result(result)
+        return self.redirect("/")
+
 
 class VisualReactionTime(TestHandler):
     test_name = "visual-reaction-time"
@@ -69,11 +72,26 @@ class VisualReactionTime(TestHandler):
         r.put()
 
 
+class VisualReactionDecisionTime(TestHandler):
+    test_name = "visual-reaction-decision-time"
+    template_name = "visual-reaction-decision-time.html"
+
+    def _handle_result(self, result):
+        ms, correct = result.split(",", 1)
+        ms = int(ms)
+        correct = correct == "t"
+        r = TestResult(
+            user=users.get_current_user(),
+            test_name=self.test_name,
+            result_value=ms,
+            result_correct=correct,)
+        r.put()
 
 
 application = webapp.WSGIApplication(
     [('/', Index),
      ('/tests/vrt', VisualReactionTime),
+     ('/tests/vrdt', VisualReactionDecisionTime),
      ],
      debug=True)
 

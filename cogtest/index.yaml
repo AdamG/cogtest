@@ -12,6 +12,7 @@ indexes:
 
 - kind: TestResult
   properties:
-  - name: user=
+  - name: user
   - name: timestamp
     direction: desc
+

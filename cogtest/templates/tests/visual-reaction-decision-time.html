@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Visual Reaction/Decision Time</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript">
+$(function(){
+    var test = {
+        results: [],
+        ctx: document.getElementById('main').getContext("2d"),
+        min_ms: 2000,
+        max_ms: 5000,
+        start_trial: function(){
+            var t = this;
+            var callback = function(){t.trigger()};
+            setTimeout(callback, this.min_ms + (Math.random() * (this.max_ms - this.min_ms)))
+        },
+        trigger: function(){
+            var t=this;
+            if(Math.random()>0.5){
+                this.ctx.fillStyle = "#000000";
+                this.ctx.fillRect(0, 0 , 800, 600);
+                var start_ms = new Date().getTime();
+                $("#main").one('click', function(){
+                    var end_ms = new Date().getTime();
+                    var reaction_time = end_ms - start_ms;
+                    t.result_callback(reaction_time, true)
+                    t.ctx.clearRect(0, 0 , 800, 600);
+                    t.start_trial()
+                });
+            }else{
+                var t=this;
+                this.ctx.fillStyle = "#000000";
+                var start_indices = [0, 100, 200, 300, 400, 500, 600, 700];
+                $.each(start_indices, function(ii, idx){
+                    t.ctx.fillRect(idx, 0, 50, 600);
+                });
+                var start_ms = new Date().getTime();
+                $("#main").one('click', function(){
+                    var end_ms = new Date().getTime();
+                    var reaction_time = end_ms - start_ms;
+                    t.result_callback(reaction_time, false)
+                });
+                setTimeout(function(){
+                    $("#main").unbind("click");
+                    t.ctx.clearRect(0, 0 , 800, 600);
+                    t.start_trial()
+                }, 2000)
+
+
+            }
+
+        },
+        result_callback: function(ms, correct){
+            this.results.push([ms, correct]);
+            $("#result-table tbody").append("<tr>" +
+                "<td>" + this.results.length + "</td>" +
+                "<td>" + ms + "</td>" +
+                "<td>" + correct + "</td></tr>");
+            if(this.results.length >= 5){
+                $("#submit-results").show()
+            }
+        },
+        submit_results: function(){
+            var $results = $("#results");
+            $.each(this.results, function(ii, result){
+                var correct;
+                if(result[1]){correct='t'}else{correct='f'}
+                $results.append('<input type="hidden" name="results" value="' + result[0] + ',' + correct + '" />');
+            });
+            $results.submit();
+        },
+    }
+    $("#submit-results").bind('click', function(){test.submit_results()});
+    test.start_trial();
+});
+        
+
+</script>
+</head>
+<body>
+
+  <p>Click when the area turns solid. Do <em>not</em> click when it turns to vertical stripes.</p>
+
+<div style="margin:auto; width: 800px; height: 600px; border: solid black 1px; padding: 10px;">
+  <canvas id="main" width="800" height="600"></canvas>
+</div>
+
+<table id="result-table">
+  <caption>Results</caption>
+  <thead>
+    <tr>
+      <th>Trial</th>
+      <th>Reaction Time(ms)</th>
+      <th>Correct?</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<div style="display: none;cursor:pointer;text-align: center; margin: 15;" id="submit-results">
+Submit Results
+</div>
+
+<form id="results" style="display: none;" action="" method="post">
+</form>
+
+</body>
+</html>
