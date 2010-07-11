@@ -4,25 +4,49 @@
   <title>Visual Reaction Time</title>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script type="text/javascript">
-function main(){
-    var canvas = document.getElementById('main');
-    var ctx = canvas.getContext('2d');
+function start_trial(ctx, result_callback, num_more_trials, submit_callback){
+    if(num_more_trials <= 0){
+        submit_callback()
+    }
     min_ms = 2000;
     max_ms = 5000;
-    setTimeout(function(){start(ctx)}, min_ms + (Math.random() * (max_ms - min_ms)));
+    setTimeout(function(){trigger(ctx, result_callback, num_more_trials, submit_callback)},
+        min_ms + (Math.random() * (max_ms - min_ms)));
     
 }
-function start(ctx){
-    var start_ms = new Date().getTime();
+function trigger(ctx, result_callback, num_more_trials, submit_callback){
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0 , 800, 600);
-    $("#main").click(function(){
+    var start_ms = new Date().getTime();
+    $("#main").one('click', function(){
         var end_ms = new Date().getTime();
         var reaction_time = end_ms - start_ms;
-        alert("" + reaction_time + " ");
-    })
+        result_callback(reaction_time);
+        ctx.clearRect(0, 0 , 800, 600);
+        start_trial(ctx, result_callback, num_more_trials - 1, submit_callback)
+    });
+    
 }
-$(main);
+function run_trials(){
+    var canvas = document.getElementById('main');
+    var ctx = canvas.getContext('2d');
+    var results = [];
+    var _result_callback = function(result){results.push(result);
+        $("#result-table tbody").append("<tr><td>0</td><td>" + result + "</td></tr>");
+    };
+    var _submit_callback = function(){submit_results(results);};
+    start_trial(ctx, _result_callback, 5, _submit_callback);
+}
+
+function submit_results(results){
+    var $results = $("#results");
+    $.each(results, function(ii, result){
+        $results.append("<input type='hidden' name='results' value=\"" + result + "\" />");
+    })
+    alert($results.serialize());
+    $results.submit();
+}
+$(run_trials);
 </script>
 </head>
 <body>
@@ -30,6 +54,22 @@ $(main);
 <div style="margin:auto; width: 800px; height: 600px; border: solid black 1px; padding: 10px;">
   <canvas id="main" width="800" height="600"></canvas>
 </div>
+
+<table id="result-table">
+  <caption>Results</caption>
+  <thead>
+    <tr>
+      <th>Trial</th>
+      <th>Reaction Time(ms)</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+
+<form id="results" style="display: none;" action="" method="post">
+</form>
 
 </body>
 </html>

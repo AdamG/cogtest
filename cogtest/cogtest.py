@@ -49,8 +49,27 @@ class TestHandler(webapp.RequestHandler):
     def _get_template_context(self):
         return {}
 
+    def post(self):
+        if not users.get_current_user():
+            return self.redirect(users.create_login_url(self.request.uri))
+        results = 1self.request.POST.getall('results')
+        for result in results:
+            self._handle_result(result)
+
 class VisualReactionTime(TestHandler):
+    test_name = "visual-reaction-time"
     template_name = "visual-reaction-time.html"
+
+    def _handle_result(self, result):
+        r = TestResult(
+            user=users.get_current_user(),
+            test_name=self.test_name,
+            result_value=int(result),
+            result_correct=True,)
+        r.put()
+
+
+
 
 application = webapp.WSGIApplication(
     [('/', Index),
