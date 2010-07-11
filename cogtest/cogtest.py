@@ -90,8 +90,8 @@ class VisualReactionDecisionTime(TestHandler):
 
 application = webapp.WSGIApplication(
     [('/', Index),
-     ('/tests/vrt', VisualReactionTime),
-     ('/tests/vrdt', VisualReactionDecisionTime),
+     ('/tests/vrt/', VisualReactionTime),
+     ('/tests/vrdt/', VisualReactionDecisionTime),
      ],
      debug=True)
 

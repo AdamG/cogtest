@@ -4,7 +4,24 @@
     <title>Cogtest</title>
   </head>
   <body>
-    <table>
+    <p>This is a collection of cognitive testing applications written
+      for HTML5 browsers and backed with Google App Engine. Many are
+      similar to those on <a href="http://cognitivefun.net/">Cognitive
+      Fun</a>, but rewritten to not use Flash.</p>
+    
+    <h3>Available Tests</h3>
+    <h4><a href="/tests/vrt/">Visual Reaction Time</a></h4>
+    <p>Click when the test area turns from white to black.</p>
+    <h4><a href="/tests/vrdt/">Visual Reaction/Decision Time</a></h4>
+    <p>Click when the test area turns from white to black. Do not
+      click when it turns to vertical stripes.</p>
+    
+
+    <h3>Want to help?</h3>
+    
+    <p><a href="http://github.com/AdamG/cogtest">Code's on github.</a></p>
+
+    <table style="margin: auto; width: 800px;">
       <caption>Your Recent Results</caption>
       <thead>
         <tr>
@@ -23,6 +40,7 @@
         {% endfor %}
       </tbody>
     </table>
+
 
   </body>
 </html>

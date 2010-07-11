@@ -15,4 +15,3 @@ indexes:
   - name: user
   - name: timestamp
     direction: desc
-
